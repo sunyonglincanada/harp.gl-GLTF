@@ -11,7 +11,6 @@ import {
   RenderEvent,
   Tile,
   TileObject,
-  registerTileObject,
   DataSource,
 } from "@here/harp-mapview";
 import * as THREE from "three";
@@ -51,18 +50,13 @@ const clock = new THREE.Clock();
 let figure: MapAnchor<THREE.Group> | undefined;
 let mixer: THREE.AnimationMixer | undefined;
 const onLoad = (object: any) => {
-  mixer = new THREE.AnimationMixer(object);
-
-  const action = mixer.clipAction(object.animations[0]);
-  action.play();
-
-  figure = object as THREE.Group;
+  figure = object.scene as THREE.Group;
   figure.traverse((child: THREE.Object3D) => {
     child.renderOrder = 10000;
   });
   figure.renderOrder = 10000;
   figure.rotateX(Math.PI / 2);
-  figure.scale.set(0.3, 0.3, 0.3);
+  figure.scale.set(10, 10, 10);
   figure.name = "guy";
 
   // snippet:harp_gl_threejs_add_animated-object_add_to_scene.ts
@@ -74,8 +68,8 @@ const onLoad = (object: any) => {
 };
 
 // snippet:harp_gl_threejs_add_animated-object_load.ts
-const loader = new FBXLoader();
-loader.load("resources/dancing.fbx", onLoad);
+const loader = new GLTFLoader();
+loader.load("resources/H22.glb", onLoad);
 // end:harp_gl_threejs_add_animated-object_load.ts
 
 const onRender = (event: RenderEvent) => {
@@ -95,81 +89,6 @@ mapView.addEventListener(MapViewEventNames.Render, onRender);
 mapView.beginAnimation();
 
 // GLTF START
-const loaderNew = new GLTFLoader();
-const tile = new Tile(this, tileKey); //Or whatever Tile implementation you have.
-
-// Assuming you know where to put the model....
-const geoPoint = new GeoCoordinates(40.70497091, -74.0135);
-const tangentSpace = {
-  position: new THREE.Vector3(),
-  xAxis: new THREE.Vector3(),
-  yAxis: new THREE.Vector3(),
-  zAxis: new THREE.Vector3(),
-};
-this.projection.localTangentSpace(geoPoint, tangentSpace);
-const worldPos = tangentSpace.position;
-const scaleFactor = this.projection.getScaleFactor(worldPos);
-worldPos.sub(tile.center);
-let data: ArrayBuffer = "resources/H22.glb";
-loaderNew.parse(
-  data,
-  ".",
-  (gltf: GLTF) => {
-    for (const child of gltf.scene.children) {
-      const obj: TileObject = child;
-      obj.displacement = worldPos;
-      obj.scale.setScalar(scaleFactor);
-      obj.setRotationFromMatrix(
-        new THREE.Matrix4().makeBasis(
-          tangentSpace.xAxis,
-          tangentSpace.yAxis,
-          tangentSpace.zAxis
-        )
-      );
-      obj.renderOrder = this.m_renderOrder ?? 1000;
-      obj.receiveShadow = tile.mapView.shadowsEnabled;
-      obj.castShadow = tile.mapView.shadowsEnabled;
-      if ((obj as any).material !== undefined) {
-        const alphaTest = 0.66;
-        const map = (obj as any).material.map;
-        const material = new THREE.MeshPhongMaterial({
-          map,
-          shininess: 60,
-          alphaTest,
-          polygonOffset: true, // prevent z-fighting at ground level
-          polygonOffsetFactor: -1.0,
-          polygonOffsetUnits: -1.0,
-        });
-        (obj as any).material = material;
-
-        //Needed for shadows... can remove if you don't have shadows
-        const customDepthMaterial = new THREE.MeshDepthMaterial({
-          depthPacking: THREE.RGBADepthPacking,
-          map,
-          alphaTest,
-        });
-
-        (obj as any).customDepthMaterial = customDepthMaterial;
-      }
-      registerTileObject(tile, obj, GeometryKind.Building);
-      if (obj.type === "Mesh") {
-        const mesh = obj as THREE.Mesh;
-        mesh.geometry.computeBoundingBox();
-        this.maxGeometryHeight = Math.max(
-          this.maxGeometryHeight,
-          mesh.geometry.boundingBox!.max.z
-        );
-      }
-      tile.objects.push(obj);
-    }
-    Tile.requestUpdate();
-    return await Promise.resolve();
-  },
-  (error: ErrorEvent) => {
-    logger.error(`Error parsing GLTF model`);
-    return await Promise.resolve();
-  }
-);
 
 // GLTF END
 
