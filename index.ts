@@ -18,10 +18,15 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { GeometryKind } from "@here/harp-datasource-protocol";
 import { assert, LoggerManager } from "@here/harp-utils";
+import * as Stats from "stats.js";
 
 import { View } from "./View";
 
 const logger = LoggerManager.instance.create("DataSource");
+
+var stats = new Stats();
+stats.setMode(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild(stats.domElement);
 
 const app = new View({
   canvas: document.getElementById("map") as HTMLCanvasElement,
@@ -63,7 +68,9 @@ const onLoad = (object: any) => {
   figure.anchor = figureGeoPosition;
   // Make sure the object is rendered on top of labels
   figure.overlay = true;
+  // stats.begin();
   mapView.mapAnchors.add(figure);
+  // stats.end();
   // end:harp_gl_threejs_add_animated-object_add_to_scene.ts
 };
 
@@ -73,12 +80,14 @@ loader.load("resources/H22.glb", onLoad);
 // end:harp_gl_threejs_add_animated-object_load.ts
 
 const onRender = (event: RenderEvent) => {
+  stats.begin();
   if (mixer) {
     // snippet:harp_gl_threejs_add_animated-object_update_animation.ts
     const delta = clock.getDelta();
     mixer.update(delta);
     // end:harp_gl_threejs_add_animated-object_update_animation.ts
   }
+  stats.end();
 };
 
 // snippet:harp_gl_threejs_add_animated-object_add_listener.ts
@@ -100,4 +109,5 @@ mapView.lookAt({
 });
 
 // make sure the map is rendered
+
 mapView.update();
