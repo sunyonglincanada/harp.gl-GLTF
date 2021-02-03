@@ -16,6 +16,7 @@ import {
 import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import { GeometryKind } from "@here/harp-datasource-protocol";
 import { assert, LoggerManager } from "@here/harp-utils";
 import * as Stats from "stats.js";
@@ -76,6 +77,12 @@ const onLoad = (object: any) => {
 
 // snippet:harp_gl_threejs_add_animated-object_load.ts
 const loader = new GLTFLoader();
+// DracoLoader
+// const dracoLoader = new DRACOLoader();
+// dracoLoader.setDecoderPath(
+//   "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/"
+// ); // use a full url path
+// loader.setDRACOLoader(dracoLoader);
 loader.load("resources/H22.glb", onLoad);
 // end:harp_gl_threejs_add_animated-object_load.ts
 
