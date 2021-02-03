@@ -4,26 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { GeoCoordinates, TileKey } from "@here/harp-geoutils";
-import {
-  MapAnchor,
-  MapViewEventNames,
-  RenderEvent,
-  Tile,
-  TileObject,
-  DataSource,
-} from "@here/harp-mapview";
+import { GeoCoordinates } from "@here/harp-geoutils";
+import { MapAnchor, MapViewEventNames, RenderEvent } from "@here/harp-mapview";
 import * as THREE from "three";
-import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
-import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
-import { GeometryKind } from "@here/harp-datasource-protocol";
-import { assert, LoggerManager } from "@here/harp-utils";
+import { LoggerManager } from "@here/harp-utils";
 import * as Stats from "stats.js";
 
 import { View } from "./View";
-
-const logger = LoggerManager.instance.create("DataSource");
 
 var stats = new Stats();
 stats.setMode(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -116,5 +105,4 @@ mapView.lookAt({
 });
 
 // make sure the map is rendered
-
 mapView.update();
