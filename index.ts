@@ -8,8 +8,6 @@ import { GeoCoordinates } from "@here/harp-geoutils";
 import { MapAnchor, MapViewEventNames, RenderEvent } from "@here/harp-mapview";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
-import { LoggerManager } from "@here/harp-utils";
 import * as Stats from "stats.js";
 
 import { View } from "./View";
@@ -66,12 +64,6 @@ const onLoad = (object: any) => {
 
 // snippet:harp_gl_threejs_add_animated-object_load.ts
 const loader = new GLTFLoader();
-// DracoLoader
-// const dracoLoader = new DRACOLoader();
-// dracoLoader.setDecoderPath(
-//   "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/"
-// ); // use a full url path
-// loader.setDRACOLoader(dracoLoader);
 loader.load("resources/H22.glb", onLoad);
 // end:harp_gl_threejs_add_animated-object_load.ts
 
@@ -92,10 +84,6 @@ mapView.addEventListener(MapViewEventNames.Render, onRender);
 
 // snippet:harp_gl_threejs_add_animated-object_begin_animation.ts
 mapView.beginAnimation();
-
-// GLTF START
-
-// GLTF END
 
 // center the camera to New York
 mapView.lookAt({
