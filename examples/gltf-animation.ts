@@ -59,7 +59,6 @@ const onLoad = (object: any) => {
   // // Make sure the object is rendered on top of labels
   figure.overlay = true;
   // Animation
-  console.log(object.animations);
   mixer = new THREE.AnimationMixer(object.scene);
   let action = mixer.clipAction(object.animations[0]);
 
