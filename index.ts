@@ -8,6 +8,11 @@ import { GeoCoordinates } from "@here/harp-geoutils";
 import { MapAnchor, MapViewEventNames, RenderEvent } from "@here/harp-mapview";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import {
+  VectorTileDataSource,
+  GeoJsonDataProvider,
+} from "@here/harp-vectortile-datasource";
+import { StyleSet } from "@here/harp-datasource-protocol";
 import * as Stats from "stats.js";
 
 import { View } from "./View";
@@ -30,7 +35,7 @@ window.addEventListener("resize", () => {
   mapView.resize(window.innerWidth, window.innerHeight);
 });
 
-const figureGeoPosition = new GeoCoordinates(40.70497091, -74.0135);
+const figureGeoPosition = new GeoCoordinates(1.278676, 103.850216);
 mapView.lookAt({
   target: figureGeoPosition,
   zoomLevel: 20,
@@ -87,10 +92,39 @@ mapView.beginAnimation();
 
 // center the camera to New York
 mapView.lookAt({
-  target: new GeoCoordinates(40.70398928, -74.01319808),
+  target: new GeoCoordinates(1.278676, 103.850216),
   zoomLevel: 17,
   tilt: 40,
 });
 
 // make sure the map is rendered
 mapView.update();
+
+async function getWirelessHotspots() {
+  const res = await fetch("resources/wireless-hotspots.geojson");
+  const data = await res.json();
+  const dataProvider = new GeoJsonDataProvider("wireless-hotspots", data);
+  const geoJsonDataSource = new VectorTileDataSource({
+    dataProvider,
+    name: "wireless-hotspots",
+  });
+  await mapView.addDataSource(geoJsonDataSource);
+  const styles: StyleSet = [
+    {
+      when: ["==", ["geometry-type"], "Point"],
+      technique: "circles",
+      renderOrder: 10000,
+      color: "#FF0000",
+      size: 15,
+    },
+  ];
+  geoJsonDataSource.setStyleSet(styles);
+  mapView.lookAt({
+    target: new GeoCoordinates(1.278676, 103.850216),
+    tilt: 45,
+    zoomLevel: 16,
+  });
+  mapView.update();
+}
+
+getWirelessHotspots();
