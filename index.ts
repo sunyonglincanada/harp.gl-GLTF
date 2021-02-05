@@ -12,7 +12,7 @@ import {
   VectorTileDataSource,
   GeoJsonDataProvider,
 } from "@here/harp-vectortile-datasource";
-import { StyleSet } from "@here/harp-datasource-protocol";
+import { Theme } from "@here/harp-datasource-protocol";
 import * as Stats from "stats.js";
 
 import { View } from "./View";
@@ -107,18 +107,23 @@ async function getWirelessHotspots() {
   const geoJsonDataSource = new VectorTileDataSource({
     dataProvider,
     name: "wireless-hotspots",
+    styleSetName: "geojson",
   });
   await mapView.addDataSource(geoJsonDataSource);
-  const styles: StyleSet = [
-    {
-      when: ["==", ["geometry-type"], "Point"],
-      technique: "circles",
-      renderOrder: 10000,
-      color: "#FF0000",
-      size: 15,
+  const styles: Theme = {
+    styles: {
+      geojson: [
+        {
+          when: ["==", ["geometry-type"], "Point"],
+          technique: "circles",
+          renderOrder: 10000,
+          color: "#FF0000",
+          size: 15,
+        },
+      ],
     },
-  ];
-  geoJsonDataSource.setStyleSet(styles);
+  };
+  geoJsonDataSource.setTheme(styles);
   mapView.lookAt({
     target: new GeoCoordinates(1.278676, 103.850216),
     tilt: 45,
