@@ -12,7 +12,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import { LoggerManager } from "@here/harp-utils";
 import * as Stats from "stats.js";
 
-import { View } from "./View";
+import { View } from "../View";
 
 var stats = new Stats();
 stats.setMode(0); // 0: fps, 1: ms, 2: mb, 3+: custom
