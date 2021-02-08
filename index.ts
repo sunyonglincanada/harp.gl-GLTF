@@ -35,6 +35,45 @@ window.addEventListener("resize", () => {
   mapView.resize(window.innerWidth, window.innerHeight);
 });
 
+async function getWirelessHotspots(color = "", name = "") {
+  const res = await fetch("resources/wireless-hotspots.geojson");
+  const data = await res.json();
+  const dataProvider = new GeoJsonDataProvider("wireless-hotspots", data);
+  const geoJsonDataSource =
+    name === "test"
+      ? new VectorTileDataSource({
+          dataProvider,
+          name: "wireless-hotspots-test",
+          styleSetName: "geojson",
+        })
+      : new VectorTileDataSource({
+          dataProvider,
+          name: "wireless-hotspots",
+          styleSetName: "geojson",
+        });
+  await mapView.addDataSource(geoJsonDataSource);
+  const styles: Theme = {
+    styles: {
+      geojson: [
+        {
+          when: ["==", ["geometry-type"], "Point"],
+          technique: "circles",
+          renderOrder: 10001,
+          color: color ? color : "#FF0000",
+          size: 15,
+        },
+      ],
+    },
+  };
+  geoJsonDataSource.setTheme(styles);
+  mapView.lookAt({
+    target: new GeoCoordinates(1.278676, 103.850216),
+    tilt: 40,
+    zoomLevel: 16,
+  });
+  mapView.update();
+}
+
 const figureGeoPosition = new GeoCoordinates(1.278676, 103.850216);
 mapView.lookAt({
   target: figureGeoPosition,
@@ -55,6 +94,7 @@ const onLoad = (object: any) => {
   figure.renderOrder = 10000;
   figure.rotateX(Math.PI / 2);
   figure.scale.set(10, 10, 10);
+  // figure.position.set(0, -10, 2.5);
   figure.name = "guy";
 
   // snippet:harp_gl_threejs_add_animated-object_add_to_scene.ts
@@ -63,6 +103,8 @@ const onLoad = (object: any) => {
   figure.overlay = true;
   // stats.begin();
   mapView.mapAnchors.add(figure);
+
+  getWirelessHotspots("", "");
   // stats.end();
   // end:harp_gl_threejs_add_animated-object_add_to_scene.ts
 };
@@ -87,6 +129,10 @@ const onRender = (event: RenderEvent) => {
 mapView.addEventListener(MapViewEventNames.Render, onRender);
 // end:harp_gl_threejs_add_animated-object_add_listener.ts
 
+window.addEventListener("click", (evt) => {
+  getWirelessHotspots("#000", "test");
+});
+
 // snippet:harp_gl_threejs_add_animated-object_begin_animation.ts
 mapView.beginAnimation();
 
@@ -99,37 +145,3 @@ mapView.lookAt({
 
 // make sure the map is rendered
 mapView.update();
-
-async function getWirelessHotspots() {
-  const res = await fetch("resources/wireless-hotspots.geojson");
-  const data = await res.json();
-  const dataProvider = new GeoJsonDataProvider("wireless-hotspots", data);
-  const geoJsonDataSource = new VectorTileDataSource({
-    dataProvider,
-    name: "wireless-hotspots",
-    styleSetName: "geojson",
-  });
-  await mapView.addDataSource(geoJsonDataSource);
-  const styles: Theme = {
-    styles: {
-      geojson: [
-        {
-          when: ["==", ["geometry-type"], "Point"],
-          technique: "circles",
-          renderOrder: 10000,
-          color: "#FF0000",
-          size: 15,
-        },
-      ],
-    },
-  };
-  geoJsonDataSource.setTheme(styles);
-  mapView.lookAt({
-    target: new GeoCoordinates(1.278676, 103.850216),
-    tilt: 45,
-    zoomLevel: 16,
-  });
-  mapView.update();
-}
-
-getWirelessHotspots();
